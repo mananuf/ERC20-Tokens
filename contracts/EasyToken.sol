@@ -3,9 +3,9 @@
 pragma solidity ^0.8.20;
 
 // import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./interface/ERC20.sol";
+import "./CustomERC20.sol";
 
-contract EasyToken is ERC20("EasyToken", "USDE") {
+contract EasyToken is CustomERC20("EasyToken", "USDE", 18) {
     address public owner;
 
     constructor() {

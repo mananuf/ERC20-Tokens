@@ -27,10 +27,10 @@ contract ERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     // Constructor to initialize name, symbol, and decimals
-    constructor(string memory name_, string memory symbol_) {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_) {
         _name = name_;
         _symbol = symbol_;
-        // _decimals = decimals_;
+        _decimals = decimals_;
     }
 
     // Public view functions
@@ -156,5 +156,12 @@ contract ERC20 {
         unchecked {
             _approve(owner, spender, currentAllowance - amount);
         }
+    }
+
+
+    // test internal functions
+    // Public function to test _mint
+    function testMint(address account, uint256 amount) external {
+        _mint(account, amount);
     }
 }

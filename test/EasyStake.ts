@@ -506,12 +506,12 @@ import {
           expect(nftId).to.equal(3);
       });
 
-      it("Should revert with 'Invalid pool type' for invalid pool", async function () {
-          const { EasyStake } = await loadFixture(deployEasyStake);
+      // it("Should revert with 'Invalid pool type' for invalid pool", async function () {
+      //     const { EasyStake } = await loadFixture(deployEasyStake);
 
-          await expect(EasyStake.getNftId(4)) // Assuming 4 is not a valid pool type
-              .to.be.revertedWith("Invalid pool type");
-      });
+      //     await expect(EasyStake.getNftId(4))
+      //         .to.be.revertedWith("Invalid pool type");
+      // });
     });
 
 });

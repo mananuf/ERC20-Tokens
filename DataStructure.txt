@@ -1,0 +1,11 @@
+Stakig Pools
+
+            1Dimension          2Dimension
+
+                             |---- user 1 stake
+        |----- Pool 1 -------|---- user 2 stake
+        |                    |____ user 3 stake
+MAPS---------- Pool 2
+        |                    |---- user 1 stake
+        |_____ Pool 3 -------|---- user 2 stake
+                             |____ user 3 stake

@@ -17,13 +17,10 @@ contract EasyStake {
         uint256 stakedAt;
         uint256 finishesAt;
         uint8 nftReward;
-        Pools poolType;
         bool claimed;
     }
 
-    mapping(address => Stake) public stakes;
-
-    enum Pools { oneWeekPool, twoWeeksPool, threeWeeksPool }
+    mapping(uint8 => mapping(address => Stake)) public pools;
 
     error TimeHasNotEllapsed();
 
@@ -46,49 +43,46 @@ contract EasyStake {
         uint8[3] memory nftForPool = [1,2,3];
         uint256[3] memory duration;
         duration[0] = block.timestamp + (7 * 24 * 60 * 60); // 1 week
-        duration[1] =  block.timestamp + (14 * 24 * 60 * 60); // 2 weeks
-        duration[2] =    block.timestamp + (21 * 24 * 60 * 60); // 3 weeks
+        duration[1] = block.timestamp + (14 * 24 * 60 * 60); // 2 weeks
+        duration[2] = block.timestamp + (21 * 24 * 60 * 60); // 3 weeks
 
 
         uint8 numberOfNft = nftForPool[_poolId];
         uint256 _finishesAt = duration[_poolId];
-        Pools _poolType = Pools(_poolId);
 
-        stakes[msg.sender] = Stake({
+        pools[_poolId][msg.sender] = Stake({
             amountStaked: _amount,
             stakedAt: block.timestamp,
             finishesAt: _finishesAt,
             nftReward: numberOfNft,
-            claimed: false,
-            poolType: _poolType
+            claimed: false
         });
 
         emit Staked(msg.sender, _amount, _poolId);
     }
 
-    function claimReward(bool _convertTokenToNft) external {
-        // require(stakes[msg.sender].claimed == false, "Claimed Already");
-        uint8 numberOfNftToClaim;
-        uint8 nftReward = stakes[msg.sender].nftReward;
+    // function claimReward(bool _convertTokenToNft) external {
+    //     // require(stakes[msg.sender].claimed == false, "Claimed Already");
+    //     uint8 numberOfNftToClaim;
+    //     uint8 nftReward = stakes[msg.sender].nftReward;
 
-        if(block.timestamp >= stakes[msg.sender].finishesAt) {
-            numberOfNftToClaim = stakes[msg.sender].nftReward;
-            stakes[msg.sender].claimed = true;
+    //     if(block.timestamp >= stakes[msg.sender].finishesAt) {
+    //         numberOfNftToClaim = stakes[msg.sender].nftReward;
+    //         stakes[msg.sender].claimed = true;
 
-            if (_convertTokenToNft) {
-                uint256 nftId = getNftIdForPool(stakes[msg.sender].poolType);
-                nftToken.mint(msg.sender, nftId, numberOfNftToClaim, "");
-            } else {
-                uint rewardTokens = (nftReward * numberOfTokensPerReward);
-                // + stakes[msg.sender].amountStaked;
-                easyToken.transfer(msg.sender, rewardTokens);
-            }
-        } else {
-            revert TimeHasNotEllapsed();
-        }
+    //         if (_convertTokenToNft) {
+    //             // claim nft
+    //         } else {
+    //             uint rewardTokens = (nftReward * numberOfTokensPerReward);
+    //             // + stakes[msg.sender].amountStaked;
+    //             easyToken.transfer(msg.sender, rewardTokens);
+    //         }
+    //     } else {
+    //         revert TimeHasNotEllapsed();
+    //     }
 
-        emit RewardClaimed(msg.sender, nftReward, _convertTokenToNft);
-    }
+    //     emit RewardClaimed(msg.sender, nftReward, _convertTokenToNft);
+    // }
 
 
 
@@ -98,17 +92,5 @@ contract EasyStake {
 
     function getEasyStakeBalance() external view returns (uint) {
         return easyToken.balanceOf(address(this));
-    }
-
-    function getNftIdForPool(Pools pool) internal pure returns (uint256) {
-        if (pool == Pools.oneWeekPool) return 1;
-        if (pool == Pools.twoWeeksPool) return 2;
-        if (pool == Pools.threeWeeksPool) return 3;
-        revert("Invalid pool type");
-    }
-
-    // dev function for test purpose
-    function getNftId(Pools pool) external pure returns (uint256) {
-        return getNftIdForPool(pool);
     }
 }

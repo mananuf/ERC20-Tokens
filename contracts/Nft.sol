@@ -13,7 +13,7 @@ contract NFT is ERC1155{
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "must nft owner");
+        require(msg.sender == owner);
         _;
     }
 
