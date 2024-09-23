@@ -5,10 +5,10 @@ async function main() {
     const signerAddress = await signer.getAddress();
 
     const EasyTokenAddress = "0xA48331133465F9bC5c05dBEF2B0c4026ca52779b";
-    const easyToken = await ethers.getContractAt("IERC20", EasyTokenAddress, signer);
+    const easyToken = await ethers.getContractAt("IERC20", EasyTokenAddress);
 
     const EasyStakeContractAddress = "0xE7C0fC80EB163258e58D56D98b3d58bD2Ec878Cf";
-    const easyStake = await ethers.getContractAt("IEasyStake", EasyStakeContractAddress, signer);
+    const easyStake = await ethers.getContractAt("IEasyStake", EasyStakeContractAddress);
 
     // Approve savings contract to spend token
     const approvalAmount = ethers.parseUnits("1000", 18);
