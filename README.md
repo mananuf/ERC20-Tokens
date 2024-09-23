@@ -6,3 +6,4 @@ Try running some of the following tasks:
 
 EasyTokenModule#EasyToken - 0xA48331133465F9bC5c05dBEF2B0c4026ca52779b
 EasyStakeModule#EasyStake - 0xE7C0fC80EB163258e58D56D98b3d58bD2Ec878Cf
+NFT opensea - 0x3e940762B2d3EC049FF075064bED358720a9260B  
