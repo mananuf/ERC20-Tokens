@@ -61,33 +61,29 @@ contract EasyStake {
         emit Staked(msg.sender, _amount, _poolId);
     }
 
-    // function claimReward(bool _convertTokenToNft) external {
-    //     // require(stakes[msg.sender].claimed == false, "Claimed Already");
-    //     uint8 numberOfNftToClaim;
-    //     uint8 nftReward = stakes[msg.sender].nftReward;
+    function claimReward(bool _convertTokenToNft, uint8 _poolId) external {
+        uint8 numberOfNftToClaim;
+        uint8 nftReward = pools[_poolId][msg.sender].nftReward;
 
-    //     if(block.timestamp >= stakes[msg.sender].finishesAt) {
-    //         numberOfNftToClaim = stakes[msg.sender].nftReward;
-    //         stakes[msg.sender].claimed = true;
+        if(block.timestamp >= pools[_poolId][msg.sender].finishesAt) {
+            numberOfNftToClaim = pools[_poolId][msg.sender].nftReward;
+            pools[_poolId][msg.sender].claimed = true;
 
-    //         if (_convertTokenToNft) {
-    //             // claim nft
-    //         } else {
-    //             uint rewardTokens = (nftReward * numberOfTokensPerReward);
-    //             // + stakes[msg.sender].amountStaked;
-    //             easyToken.transfer(msg.sender, rewardTokens);
-    //         }
-    //     } else {
-    //         revert TimeHasNotEllapsed();
-    //     }
+            if (_convertTokenToNft) {
+                nftToken.mint(msg.sender, 1, nftReward, "easy stake pool");
+            } else {
+                uint rewardTokens = (nftReward * numberOfTokensPerReward);
+                easyToken.transfer(msg.sender, rewardTokens);
+            }
+        } else {
+            revert TimeHasNotEllapsed();
+        }
 
-    //     emit RewardClaimed(msg.sender, nftReward, _convertTokenToNft);
-    // }
+        emit RewardClaimed(msg.sender, nftReward, _convertTokenToNft);
+    }
 
-
-
-    function convertNftBackToTokens() external {
-        //get minted NFt type and convert back to tokens
+    function getUserStakeDetails(uint8 _poolId, address _userAddress) external view {
+        pools[_poolId][_userAddress];
     }
 
     function getEasyStakeBalance() external view returns (uint) {
