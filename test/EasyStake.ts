@@ -210,7 +210,7 @@ import {
         // //ACT
         await expect(EasyStake.connect(otherAccount).stake(stakedAmount, poolId)).to.emit(EasyStake, 'Staked').withArgs(otherAccount.address, stakedAmount, poolId);
 
-        const stake = await EasyStake.stakes(otherAccount.address);
+        const stake = await EasyStake.pools(poolId, otherAccount.address);
 
         const currentTimestamp = (await hre.ethers.provider.getBlock()).timestamp;
         const expectedFinishAt = currentTimestamp + (7 * 24 * 60 * 60); // 7 days duration
@@ -220,7 +220,6 @@ import {
         expect(stake.stakedAt).to.be.closeTo(currentTimestamp, 2); // Allow 2 seconds discrepancy
         expect(stake.finishesAt).to.equal(expectedFinishAt);
         expect(stake.nftReward).to.equal(1); // 1weekPool gives 1 NFTs
-        expect(stake.poolType).to.equal(poolId);
         expect(stake.claimed).to.equal(false);
       })
 
@@ -248,7 +247,7 @@ import {
         // //ACT
         await expect(EasyStake.connect(otherAccount).stake(stakedAmount, poolId)).to.emit(EasyStake, 'Staked').withArgs(otherAccount.address, stakedAmount, poolId);
 
-        const stake = await EasyStake.stakes(otherAccount.address);
+        const stake = await EasyStake.pools(poolId, otherAccount.address);
 
         const currentTimestamp = (await hre.ethers.provider.getBlock()).timestamp;
         const expectedFinishAt = currentTimestamp + (14 * 24 * 60 * 60); // 14 days duration
@@ -258,7 +257,7 @@ import {
         expect(stake.stakedAt).to.be.closeTo(currentTimestamp, 2); // Allow 2 seconds discrepancy
         expect(stake.finishesAt).to.equal(expectedFinishAt);
         expect(stake.nftReward).to.equal(2); // 2weeksPool gives 2 NFTs
-        expect(stake.poolType).to.equal(poolId);
+        // expect(stake.poolType).to.equal(poolId);
         expect(stake.claimed).to.equal(false);
       })
 
@@ -286,7 +285,7 @@ import {
         // //ACT
         await expect(EasyStake.connect(otherAccount).stake(stakedAmount, poolId)).to.emit(EasyStake, 'Staked').withArgs(otherAccount.address, stakedAmount, poolId);
 
-        const stake = await EasyStake.stakes(otherAccount.address);
+        const stake = await EasyStake.pools(poolId, otherAccount.address);
 
         const currentTimestamp = (await hre.ethers.provider.getBlock()).timestamp;
         const expectedFinishAt = currentTimestamp + (21 * 24 * 60 * 60); // 21 days duration
@@ -296,7 +295,7 @@ import {
         expect(stake.stakedAt).to.be.closeTo(currentTimestamp, 2); // Allow 2 seconds discrepancy
         expect(stake.finishesAt).to.equal(expectedFinishAt);
         expect(stake.nftReward).to.equal(3); // 3weekPool gives 3 NFTs
-        expect(stake.poolType).to.equal(poolId);
+        // expect(stake.poolType).to.equal(poolId);
         expect(stake.claimed).to.equal(false);
       })
     });
@@ -307,8 +306,8 @@ import {
           const { EasyStake, otherAccount } = await loadFixture(deployEasyStake);
       
           // Call claimReward with an incorrect parameter type (e.g., a number instead of a bool)
-            await expect( EasyStake.connect(otherAccount).claimReward(1234)).to.be.reverted;
-            await expect( EasyStake.connect(otherAccount).claimReward("true")).to.be.reverted;
+            await expect( EasyStake.connect(otherAccount).claimReward(1234, 1)).to.be.reverted;
+            await expect( EasyStake.connect(otherAccount).claimReward("true", 1)).to.be.reverted;
         });
       
         it("Should revert with customError 'TimeHasNotEllapsed' if the user tries to claim reward before staking period is over", async function () {
@@ -327,7 +326,7 @@ import {
           await EasyStake.connect(otherAccount).stake(stakedAmount, poolId);
       
           //try to claim reward
-          await expect( EasyStake.connect(otherAccount).claimReward(false)).to.be.revertedWithCustomError(EasyStake,'TimeHasNotEllapsed');
+          await expect( EasyStake.connect(otherAccount).claimReward(false, poolId)).to.be.revertedWithCustomError(EasyStake,'TimeHasNotEllapsed');
         });
       
         it("Should allow claiming reward after time has passed for 1 week pool", async function () {
@@ -349,7 +348,7 @@ import {
           await network.provider.send("evm_mine"); // Mine a block to finalize the time jump
       
           // Claim the reward after time has passed
-          await expect(EasyStake.connect(otherAccount).claimReward(false))
+          await expect(EasyStake.connect(otherAccount).claimReward(false, poolId))
             .to.emit(EasyStake, 'RewardClaimed')
             .withArgs(otherAccount.address, 1, false); // 1 weekpool gives 1 NFT reward
         });
@@ -373,7 +372,7 @@ import {
             await network.provider.send("evm_mine"); // Mine a block to finalize the time jump
         
             // Claim the reward after time has passed
-            await expect(EasyStake.connect(otherAccount).claimReward(false))
+            await expect(EasyStake.connect(otherAccount).claimReward(false, poolId))
               .to.emit(EasyStake, 'RewardClaimed')
               .withArgs(otherAccount.address, 2, false); // 2 weekpool gives 2 NFT reward
           });
@@ -397,7 +396,7 @@ import {
         await network.provider.send("evm_mine"); // Mine a block to finalize the time jump
     
         // Claim the reward after time has passed
-        await expect(EasyStake.connect(otherAccount).claimReward(false))
+        await expect(EasyStake.connect(otherAccount).claimReward(false, poolId))
             .to.emit(EasyStake, 'RewardClaimed')
             .withArgs(otherAccount.address, 3, false); // 3 weekpool gives 3 NFT reward
         });
@@ -422,7 +421,7 @@ import {
     
           // Claim the reward and expect the event
           await expect(
-            EasyStake.connect(otherAccount).claimReward(false)
+            EasyStake.connect(otherAccount).claimReward(false, poolId)
           )
             .to.emit(EasyStake, 'RewardClaimed')
             .withArgs(otherAccount.address, 1, false); // poolId 0 gives 1 NFT reward
@@ -453,7 +452,7 @@ import {
           await EasyToken.approve(otherAccount, expectedTokenAmount);
       
           // Claim the reward as tokens (convertTokenToNft = false)
-          await expect(EasyStake.connect(otherAccount).claimReward(false))
+          await expect(EasyStake.connect(otherAccount).claimReward(false, poolId))
             .to.emit(EasyStake, 'RewardClaimed')
             .withArgs(otherAccount.address, 1, false);
       
@@ -480,38 +479,6 @@ import {
           // Verify that the returned balance matches the initial balance
           expect(balance).to.equal(initialBalance);
       });
-    });
-  
-
-    describe("Test getNftIdForPool function", function () {
-      const Pools = {
-          oneWeekPool: 0,
-          twoWeeksPool: 1,
-          threeWeeksPool: 2,
-      };
-
-      it("Should return correct NFT ID for each valid pool", async function () {
-          const { EasyStake } = await loadFixture(deployEasyStake);
-
-          // Test for oneWeekPool
-          let nftId = await EasyStake.getNftId(Pools.oneWeekPool); // Call the proxy function
-          expect(nftId).to.equal(1);
-
-          // Test for twoWeeksPool
-          nftId = await EasyStake.getNftId(Pools.twoWeeksPool);
-          expect(nftId).to.equal(2);
-
-          // Test for threeWeeksPool
-          nftId = await EasyStake.getNftId(Pools.threeWeeksPool);
-          expect(nftId).to.equal(3);
-      });
-
-      // it("Should revert with 'Invalid pool type' for invalid pool", async function () {
-      //     const { EasyStake } = await loadFixture(deployEasyStake);
-
-      //     await expect(EasyStake.getNftId(4))
-      //         .to.be.revertedWith("Invalid pool type");
-      // });
     });
 
 });

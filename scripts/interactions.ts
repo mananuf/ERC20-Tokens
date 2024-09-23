@@ -25,16 +25,8 @@ async function main() {
     await stakeTx.wait();
 
     console.log("Staking successful.");
-
-    // 3. Retrieve Stake Information
-    // const stakeInfo = await easyStake.getUserStakeDetails(poolId, signerAddress);
-    // console.log("Stake Information:");
-    // console.log(`Amount Staked: ${ethers.formatUnits(stakeInfo.amountStaked, 18)} EASY`);
-    // console.log(`Staked At: ${new Date(stakeInfo.stakedAt * 1000).toLocaleString()}`);
-    // console.log(`Finishes At: ${new Date(stakeInfo.finishesAt * 1000).toLocaleString()}`);
-    // console.log(`NFT Reward: ${stakeInfo.nftReward}`);
-    // console.log(`Claimed: ${stakeInfo.claimed}`);
     
+    // claim rewards
     const convertToNft = true;
     try {
         const claimTx = await easyStake.claimReward(convertToNft, poolId);
@@ -45,11 +37,11 @@ async function main() {
         console.log(error);
     }
     
-    // 5. Get EasyStake Contract's Token Balance
+    // Get EasyStake Contract's Token Balance
     const contractBalance = await easyStake.getEasyStakeBalance();
     console.log(`EasyStake Contract Balance: ${ethers.formatUnits(contractBalance, 18)} EASY`);
 
-    // 6. Additional: Get User's EasyToken Balance
+    // Additional: Get User's EasyToken Balance
     const userBalance = await easyToken.balanceOf(signer.address);
     console.log(`Your EasyToken Balance: ${ethers.formatUnits(userBalance, 18)} EASY`);
 }

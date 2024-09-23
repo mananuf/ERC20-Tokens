@@ -82,10 +82,6 @@ contract EasyStake {
         emit RewardClaimed(msg.sender, nftReward, _convertTokenToNft);
     }
 
-    function getUserStakeDetails(uint8 _poolId, address _userAddress) external view {
-        pools[_poolId][_userAddress];
-    }
-
     function getEasyStakeBalance() external view returns (uint) {
         return easyToken.balanceOf(address(this));
     }

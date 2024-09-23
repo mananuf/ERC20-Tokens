@@ -9,5 +9,4 @@ interface IEasyStake {
     function stake(uint _amount, uint8 _poolId) external;
     function claimReward(bool _convertTokenToNft, uint8 _poolId) external;
     function getEasyStakeBalance() external view returns (uint);
-    function getUserStakeDetails(uint8 _poolId, address _userAddress) external view;
 }
